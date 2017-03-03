@@ -4,6 +4,7 @@ namespace Drupal\fractal_handles\Template\Loader;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Twig_Loader_Filesystem;
 
 class FractalHandlesLoader extends Twig_Loader_Filesystem {
@@ -108,17 +109,18 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
         continue;
       }
 
-      /** @var \Iterator|SplFileInfo $directory */
-      $directory = reset($finder->getIterator());
+      /** @var SplFileInfo $file */
+      foreach ($finder as $file) {
+        $twigPath = [
+          $activeTheme,
+          'components',
+          $file->getRelativePathname(),
+          $file->getFilename() . '.twig'
+        ];
 
-      $twigPath = [
-        $activeTheme,
-        'components',
-        $directory->getRelativePathname(),
-        $directory->getFilename() . '.twig'
-      ];
+        return implode(DIRECTORY_SEPARATOR, $twigPath);
+      }
 
-      return implode(DIRECTORY_SEPARATOR, $twigPath);
     }
 
     throw new \Twig_Error_Loader("Fractal component <code>{$handle}</code> not found.");
