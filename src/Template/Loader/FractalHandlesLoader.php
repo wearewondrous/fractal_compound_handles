@@ -7,7 +7,15 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Twig_Loader_Filesystem;
 
+/**
+ * Loads templates from the a "components" folder in the current theme.
+ *
+ * This adds a discovery to the Twig filesystem loader so that templates can be
+ * referenced via "#my_component".
+ */
 class FractalHandlesLoader extends Twig_Loader_Filesystem {
+
+  const TWIG_EXTENSION = 'twig';
 
   /**
    * @var ThemeManagerInterface
@@ -115,14 +123,13 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
           $activeTheme,
           'components',
           $file->getRelativePathname(),
-          $file->getFilename() . '.twig'
+          $file->getFilename() . '.' . self::TWIG_EXTENSION
         ];
 
         return implode(DIRECTORY_SEPARATOR, $twigPath);
       }
-
     }
 
-    throw new \Twig_Error_Loader("Fractal component <code>{$handle}</code> not found.");
+    throw new \Twig_Error_Loader("Fractal component '{$handle}' not found.");
   }
 }
