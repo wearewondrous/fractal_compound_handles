@@ -2,27 +2,31 @@
 
 namespace Drupal\fractal_handles\Template\Loader;
 
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig_Loader_Filesystem;
 
 class FractalHandlesLoader extends Twig_Loader_Filesystem {
 
-  private $rootPath;
+  /**
+   * @var ThemeManagerInterface
+   */
+  protected $theme_manager;
 
   /**
-   * Constructs a new FilesystemLoader object.
+   * Construct a new FilesystemLoader object.
    *
-   * @param string|array $paths
-   *   A path or an array of paths to check for templates.
+   * @param string|array $paths A path or an array of paths where to look for templates
+   * @param ThemeManagerInterface $themeManager
    */
-  public function __construct($paths = []) {
-    parent::__construct($paths);
-    $this->rootPath = $paths;
+  public function __construct($paths = array(), ThemeManagerInterface $themeManager) {
+    parent::__construct($paths, null);
+    $this->theme_manager = $themeManager;
   }
 
   /**
    *
-   * Just return the default namespace with the name
+   * Just return the default namespace with the name.
    *
    * @param $name
    * @param string $default
@@ -35,65 +39,88 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
 
   /**
    *
-   * changes the # Handle to the template name
+   * Change the # handle to the template name.
    *
    * @param string $name
    *
    * @return bool|string
    */
   public function getCacheKey($name) {
-    return parent::getCacheKey($this->handleToName($name));
+    return parent::getCacheKey($this->convertToTwigPath($name));
   }
 
   /**
    *
-   * Run exists with the correct template path
+   * Run exists with the correct template path.
    *
    * @param string $name
    *
    * @return bool
    */
   public function exists($name) {
-    return parent::exists($this->handleToName($name));
+    return parent::exists($this->convertToTwigPath($name));
   }
 
   /**
    *
-   * Run getSourceContext with the correct template path
+   * Run getSourceContext with the correct template path.
    *
    * @param string $name
    *
    * @return \Twig_Source
    */
   public function getSourceContext($name) {
-    return parent::getSourceContext($this->handleToName($name));
+    return parent::getSourceContext($this->convertToTwigPath($name));
   }
 
   /**
    *
-   * Convert a fractal Handle '#componentName' to a twig template path
+   * Convert a fractal Handle '#componentName' to a twig template path.
    *
    * @param $handle
    *
    * @return string
    */
-  private function handleToName($handle) {
+  private function convertToTwigPath($handle) {
     if ($handle[0] !== '#') {
       return $handle;
     }
 
-    $activeTheme = \Drupal::theme()->getActiveTheme()->getPath();
+    $activeTheme = $this->theme_manager->getActiveTheme()->getPath();
     $componentName = substr($handle, 1);
 
-    // find the correct folder;
-    $finder = new Finder();
-    $finder
-      ->directories()
-      ->in($this->rootPath . '/' . $activeTheme . '/' . 'components')
-      ->name($componentName);
+    foreach ($this->getPaths() as $path) {
+      $directoryPath = [
+        $path,
+        $activeTheme,
+        'components'
+      ];
+      $directoryPath = implode(DIRECTORY_SEPARATOR, $directoryPath);
 
-    foreach ($finder as $directory) {
-      return $activeTheme . '/' . 'components' . '/' . $directory->getRelativePathname() . '/' . $directory->getFilename() . '.twig';
+      // find the correct folder;
+      $finder = new Finder();
+      $finder
+        ->directories()
+        ->in($directoryPath)
+        ->name($componentName);
+
+      if ($finder->count() !== 1) {
+        continue;
+      }
+
+      /** @var \Iterator|SplFileInfo $directory */
+      $directory = reset($finder->getIterator());
+
+      $twigPath = [
+        $activeTheme,
+        'components',
+        $directory->getRelativePathname(),
+        $directory->getFilename() . '.twig'
+      ];
+
+      return implode(DIRECTORY_SEPARATOR, $twigPath);
     }
+
+    throw new \Twig_Error_Loader("Fractal component <code>{$handle}</code> not found.");
   }
 }
