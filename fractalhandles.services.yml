@@ -1,6 +1,0 @@
-services:
-  twig.loader.fractalhandles:
-    class: Drupal\fractalhandles\Template\Loader\FractalHandlesLoader
-    arguments: ['@app.root']
-    tags:
-      - { name: twig.loader, priority: 50 }

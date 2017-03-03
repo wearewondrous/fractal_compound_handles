@@ -1,12 +1,11 @@
 <?php
 
-namespace Drupal\fractalhandles\Template\Loader;
+namespace Drupal\fractal_handles\Template\Loader;
 
 use Symfony\Component\Finder\Finder;
 use Twig_Loader_Filesystem;
 
-class FractalHandlesLoader extends Twig_Loader_Filesystem
-{
+class FractalHandlesLoader extends Twig_Loader_Filesystem {
 
   private $rootPath;
 
@@ -16,11 +15,9 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    * @param string|array $paths
    *   A path or an array of paths to check for templates.
    */
-  public function __construct($paths = [])
-  {
+  public function __construct($paths = []) {
     parent::__construct($paths);
     $this->rootPath = $paths;
-
   }
 
   /**
@@ -29,10 +26,10 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    *
    * @param $name
    * @param string $default
+   *
    * @return array
    */
-  protected function parseName($name, $default = self::MAIN_NAMESPACE)
-  {
+  protected function parseName($name, $default = self::MAIN_NAMESPACE) {
     return [$default, $name];
   }
 
@@ -41,10 +38,10 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    * changes the # Handle to the template name
    *
    * @param string $name
+   *
    * @return bool|string
    */
-  public function getCacheKey($name)
-  {
+  public function getCacheKey($name) {
     return parent::getCacheKey($this->handleToName($name));
   }
 
@@ -53,10 +50,10 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    * Run exists with the correct template path
    *
    * @param string $name
+   *
    * @return bool
    */
-  public function exists($name)
-  {
+  public function exists($name) {
     return parent::exists($this->handleToName($name));
   }
 
@@ -65,10 +62,10 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    * Run getSourceContext with the correct template path
    *
    * @param string $name
+   *
    * @return \Twig_Source
    */
-  public function getSourceContext($name)
-  {
+  public function getSourceContext($name) {
     return parent::getSourceContext($this->handleToName($name));
   }
 
@@ -77,11 +74,13 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
    * Convert a fractal Handle '#componentName' to a twig template path
    *
    * @param $handle
+   *
    * @return string
    */
-  private function handleToName($handle)
-  {
-    if($handle[0] !== '#') return $handle;
+  private function handleToName($handle) {
+    if ($handle[0] !== '#') {
+      return $handle;
+    }
 
     $activeTheme = \Drupal::theme()->getActiveTheme()->getPath();
     $componentName = substr($handle, 1);
@@ -94,7 +93,7 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem
       ->name($componentName);
 
     foreach ($finder as $directory) {
-      return $activeTheme . '/' . 'components' .'/' . $directory->getRelativePathname() . '/' . $directory->getFilename() .'.twig';
+      return $activeTheme . '/' . 'components' . '/' . $directory->getRelativePathname() . '/' . $directory->getFilename() . '.twig';
     }
   }
 }
