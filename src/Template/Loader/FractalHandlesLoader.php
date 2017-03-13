@@ -3,19 +3,11 @@
 namespace Drupal\fractal_handles\Template\Loader;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Twig_Loader_Filesystem;
 
-/**
- * Loads templates from the a "components" folder in the current theme.
- *
- * This adds a discovery to the Twig filesystem loader so that templates can be
- * referenced via "#my_component".
- */
 class FractalHandlesLoader extends Twig_Loader_Filesystem {
 
-  const TWIG_EXTENSION = 'twig';
+  const TWIG_EXTENSION = '.twig';
 
   /**
    * @var ThemeManagerInterface
@@ -23,14 +15,15 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
   protected $theme_manager;
 
   /**
-   * Construct a new FilesystemLoader object.
+   * Constructs a new ComponentsLoader object.
    *
-   * @param string|array $paths A path or an array of paths where to look for templates
-   * @param ThemeManagerInterface $themeManager
+   * @param string|array $paths
+   *   A path or an array of paths to check for templates.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    */
   public function __construct($paths = array(), ThemeManagerInterface $themeManager) {
-    parent::__construct($paths, null);
     $this->theme_manager = $themeManager;
+    parent::__construct($paths);
   }
 
   /**
@@ -83,6 +76,22 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
   }
 
   /**
+   * @param string $handle
+   * @param array $namespaces
+   *
+   * @return string
+   */
+  private function findCurrentNamespace($handle, $namespaces) {
+    foreach ($namespaces as $namespace) {
+      if (stripos($handle, $namespace) === 1) {
+        return $namespace;
+      }
+    }
+
+    return '';
+  }
+
+  /**
    *
    * Convert a fractal Handle '#componentName' to a twig template path.
    *
@@ -91,45 +100,41 @@ class FractalHandlesLoader extends Twig_Loader_Filesystem {
    * @return string
    */
   private function convertToTwigPath($handle) {
-    if ($handle[0] !== '#') {
+    $activeTheme = $this->theme_manager->getActiveTheme();
+    $infoYml = $activeTheme->getExtension()->info;
+
+    if (empty($infoYml['component-libraries'])) {
       return $handle;
     }
 
-    $activeTheme = $this->theme_manager->getActiveTheme()->getPath();
-    $componentName = substr($handle, 1);
+    $libs = $infoYml['component-libraries'];
+    $namespace = $this->findCurrentNamespace($handle, array_keys($libs));
 
-    foreach ($this->getPaths() as $path) {
-      $directoryPath = [
-        $path,
-        $activeTheme,
-        'components'
-      ];
-      $directoryPath = implode(DIRECTORY_SEPARATOR, $directoryPath);
-
-      // find the correct folder;
-      $finder = new Finder();
-      $finder
-        ->directories()
-        ->in($directoryPath)
-        ->name($componentName);
-
-      if ($finder->count() !== 1) {
-        continue;
-      }
-
-      /** @var SplFileInfo $file */
-      foreach ($finder as $file) {
-        $twigPath = [
-          $activeTheme,
-          'components',
-          $file->getRelativePathname(),
-          $file->getFilename() . '.' . self::TWIG_EXTENSION
-        ];
-
-        return implode(DIRECTORY_SEPARATOR, $twigPath);
-      }
+    // check for correct parsing and namespace
+    if (empty($libs[$namespace]['paths'])) {
+      return $handle;
     }
 
-    throw new \Twig_Error_Loader("Fractal component '{$handle}' not found.");
+    // we only want handles without file extension
+    if (substr($handle, -1 * strlen($handle)) === self::TWIG_EXTENSION) {
+      return $handle;
+    }
+
+    $filename = $componentName = substr($handle, strlen($namespace) + 1);
+    $subpaths = explode(DIRECTORY_SEPARATOR, $componentName);
+
+    if (count($subpaths) > 1) {
+      $filename = array_pop($subpaths);
+    }
+
+    $path = [
+      $activeTheme->getPath(),
+      reset($libs[$namespace]['paths']) . $componentName,
+      $filename . self::TWIG_EXTENSION
+    ];
+
+    $path = array_filter($path);
+
+    return implode(DIRECTORY_SEPARATOR, $path);
   }
 }

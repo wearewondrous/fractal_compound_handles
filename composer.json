@@ -10,5 +10,7 @@
     "issues": "https://github.com/WondrousLLC/fractal_handles/issues",
     "source": "https://github.com/WondrousLLC/fractal_handles.git"
   },
-  "require": { }
+  "require": {
+    "drupal/components": "^1.0"
+  }
 }
