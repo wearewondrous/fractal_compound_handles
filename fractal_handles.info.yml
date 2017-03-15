@@ -1,6 +1,0 @@
-type: module
-name: fractal_handles
-description: 'Registers Fractal Handles for Twig templates defined in a fractal component library'
-core: 8.x
-dependencies:
-  - components

@@ -1,14 +1,14 @@
 {
-  "name": "wondrousllc/fractal_handles",
+  "name": "wondrousllc/fractal_compound_handles",
   "type": "drupal-module",
-  "description": "Convert a fractal Handle '#componentName' to a twig template path.",
+  "description": "Convert a Fractal Compound Handle '@components/compound' to a twig template path.",
   "keywords": ["Drupal"],
   "license": "GPL-2.0+",
-  "homepage": "https://github.com/WondrousLLC/fractal_handles",
+  "homepage": "https://github.com/WondrousLLC/fractal_compound_handles",
   "minimum-stability": "dev",
   "support": {
-    "issues": "https://github.com/WondrousLLC/fractal_handles/issues",
-    "source": "https://github.com/WondrousLLC/fractal_handles.git"
+    "issues": "https://github.com/WondrousLLC/fractal_compound_handles/issues",
+    "source": "https://github.com/WondrousLLC/fractal_compound_handles.git"
   },
   "require": {
     "drupal/components": "^1.0"

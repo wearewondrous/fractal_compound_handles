@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\fractal_handles\Template\Loader;
+namespace Drupal\fractal_compound_handles\Template\Loader;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Twig_Loader_Filesystem;
 
-class FractalHandlesLoader extends Twig_Loader_Filesystem {
+class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
 
   const TWIG_EXTENSION = '.twig';
 

@@ -1,0 +1,6 @@
+type: module
+name: fractal_compound_handles
+description: 'Registers Fractal Compound Handles for Twig templates defined in a fractal component library'
+core: 8.x
+dependencies:
+  - components
