@@ -27,7 +27,6 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
   }
 
   /**
-   *
    * Just return the default namespace with the name.
    *
    * @param $name
@@ -40,7 +39,6 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
   }
 
   /**
-   *
    * Change the # handle to the template name.
    *
    * @param string $name
@@ -52,7 +50,6 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
   }
 
   /**
-   *
    * Run exists with the correct template path.
    *
    * @param string $name
@@ -61,6 +58,20 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
    */
   public function exists($name) {
     return parent::exists($this->convertToTwigPath($name));
+  }
+
+  /**
+   * Run isFresh with the correct template path.
+   * 
+   * @param string $name
+   *   The name of the template to check.
+   * @param int $time
+   *   The datetime int to check against.
+   * 
+   * @return bool
+   */
+  public function isFresh($name, $time) {
+    return parent::isFresh($this->convertToTwigPath($name), $time);
   }
 
   /**
