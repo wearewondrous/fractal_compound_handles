@@ -15,14 +15,11 @@ discovered by referencing it via
 ```
 
 The idea is to reference [fractal compound components](http://fractal.build/guide/components#compound-components)
-and the twig file inside the folder with the very same name.
+and the twig file inside the folder with the very same name. The same logic applies when you want to reference
+a variant: `@components/path/to/compound/component--variant`.
 
 Alternatively, the discovery via the Components Library module allows you to reference
 other files via `@components/path/to/file.twig` directly.
-
-## Todo
-
-- make variants available
 
 # History
 

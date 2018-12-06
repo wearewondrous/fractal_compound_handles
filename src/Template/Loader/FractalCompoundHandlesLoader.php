@@ -8,6 +8,7 @@ use Twig_Loader_Filesystem;
 class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
 
   const TWIG_EXTENSION = '.twig';
+  const VARIANT_DELIMITER = '--';
 
   /**
    * @var ThemeManagerInterface
@@ -140,9 +141,17 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
 
     $path = [
       $activeTheme->getPath(),
-      reset($libs[$namespace]['paths']) . $componentName,
-      $filename . self::TWIG_EXTENSION
+      reset($libs[$namespace]['paths']),
     ];
+    if (strpos($filename, '--') === FALSE) {
+      $path[] = $componentName;
+    }
+    else {
+      $path = array_merge($path, $subpaths);
+      $variantParts = explode(self::VARIANT_DELIMITER, $filename);
+      $path[] = $variantParts[0];      
+    }
+    $path[] = $filename . self::TWIG_EXTENSION;
 
     $path = array_filter($path);
 
