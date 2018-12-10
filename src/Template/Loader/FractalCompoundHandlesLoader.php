@@ -143,7 +143,8 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
       $activeTheme->getPath(),
       reset($libs[$namespace]['paths']),
     ];
-    if (strpos($filename, '--') === FALSE) {
+
+    if (strpos($filename, self::VARIANT_DELIMITER) === FALSE) {
       $path[] = $componentName;
     }
     else {
@@ -151,8 +152,8 @@ class FractalCompoundHandlesLoader extends Twig_Loader_Filesystem {
       $variantParts = explode(self::VARIANT_DELIMITER, $filename);
       $path[] = $variantParts[0];      
     }
-    $path[] = $filename . self::TWIG_EXTENSION;
 
+    $path[] = $filename . self::TWIG_EXTENSION;
     $path = array_filter($path);
 
     return implode(DIRECTORY_SEPARATOR, $path);
