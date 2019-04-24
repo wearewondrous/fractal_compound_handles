@@ -1,4 +1,6 @@
-# Fractal Compound Handles
+# Deprecated
+
+Fractal Compound Handles
 
 Drupal 8 module. Convert a fractal Handle '@components/compound' to a twig template path.
 
@@ -27,6 +29,6 @@ other files via `@components/path/to/file.twig` directly.
 
 # Credits
 
-code base: [github.com/WondrousLLC/fractal_compound_handles](https://github.com/WondrousLLC/fractal_compound_handles/)
+code base: [github.com/wearewondrous/fractal_compound_handles](https://github.com/wearewondrous/fractal_compound_handles/)
 
-developed by [WONDROUS LLC](https://www.wearewondrous.com/)
+developed by [WONDROUS](https://www.wearewondrous.com/)
